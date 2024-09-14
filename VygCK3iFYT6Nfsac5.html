@@ -1,0 +1,198 @@
+<html><head><base href="https://www.kmuhaikido.edu/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>高醫合氣道社 - 和諧與力量的結合</title>
+<style>
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+  header {
+    background-color: #1a237e;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+  }
+  nav {
+    background-color: #3949ab;
+    padding: 0.5rem;
+  }
+  nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+  }
+  nav ul li {
+    margin: 0 1rem;
+  }
+  nav ul li a {
+    color: white;
+    text-decoration: none;
+  }
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h1, h2 {
+    color: #1a237e;
+  }
+  .cta-button {
+    display: inline-block;
+    background-color: #ff4081;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  .cta-button:hover {
+    background-color: #f50057;
+  }
+  #chatbot {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  #chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+  }
+  #chat-input {
+    display: flex;
+    padding: 10px;
+  }
+  #chat-input input {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+  }
+  #chat-input button {
+    background-color: #1a237e;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>高醫合氣道社</h1>
+    <p>和諧與力量的結合</p>
+  </header>
+  
+  <nav>
+    <ul>
+      <li><a href="#about">關於我們</a></li>
+      <li><a href="#classes">課程介紹</a></li>
+      <li><a href="#events">活動日程</a></li>
+      <li><a href="#contact">聯絡我們</a></li>
+    </ul>
+  </nav>
+  
+  <main>
+    <section id="about">
+      <h2>關於高醫合氣道社</h2>
+      <p>高醫合氣道社成立於1995年，是高雄醫學大學最具歷史和特色的武術社團之一。我們致力於推廣合氣道的精神和技藝，培養身心和諧、充滿正能量的醫學生。</p>
+    </section>
+    
+    <section id="classes">
+      <h2>課程介紹</h2>
+      <ul>
+        <li>基礎合氣道技巧</li>
+        <li>高級防身術</li>
+        <li>冥想與氣的運用</li>
+        <li>武器技巧（杖、劍）</li>
+      </ul>
+      <a href="classes" class="cta-button">查看完整課程表</a>
+    </section>
+    
+    <section id="events">
+      <h2>活動日程</h2>
+      <ul>
+        <li>每週二、四晚上7:00-9:00 例行練習</li>
+        <li>每月最後一個週六 戶外訓練</li>
+        <li>每學期期末 段位考試</li>
+      </ul>
+      <a href="events" class="cta-button">報名活動</a>
+    </section>
+    
+    <section id="contact">
+      <h2>聯絡我們</h2>
+      <p>電子郵件：haikido@kmu.edu.tw</p>
+      <p>練習場地：高雄醫學大學綜合體育館3樓武術教室</p>
+      <p>社團辦公室：學生會辦公室2樓208室</p>
+    </section>
+  </main>
+  
+  <div id="chatbot">
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <input type="text" id="user-input" placeholder="請輸入您的問題...">
+      <button onclick="sendMessage()">發送</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/qna"></script>
+  
+  <script>
+    let model;
+    let chatMessages = [];
+
+    // 載入模型
+    async function loadModel() {
+      model = await qna.load();
+      console.log('模型已載入');
+    }
+
+    loadModel();
+
+    async function sendMessage() {
+      const userInput = document.getElementById('user-input').value;
+      if (userInput.trim() === '') return;
+
+      // 添加用戶訊息到聊天
+      addMessageToChat('用戶', userInput);
+
+      // 使用模型生成回答
+      const answer = await generateAnswer(userInput);
+
+      // 添加AI回答到聊天
+      addMessageToChat('AI', answer);
+
+      // 清空輸入框
+      document.getElementById('user-input').value = '';
+    }
+
+    async function generateAnswer(question) {
+      if (!model) {
+        return '抱歉，模型還在加載中。請稍後再試。';
+      }
+
+      const context = `
+        高醫合氣道社成立於1995年，是高雄醫學大學最具歷史和特色的武術社團之一。
+        我們提供基礎合氣道技巧、高級防身術、冥想與氣的運用、武器技巧（杖、劍）等課程。
+        練習時間為每週二、四晚上7:00-9:00，每月最後一個週六有戶外訓練，每學期期末舉行段位考試。
+        聯絡方式：電子郵件 haikido@kmu.edu.tw，練習場地在高雄醫學大學綜合體育館3樓武術教室，社團辦公室位於學生會辦公室2樓208室。
+      `;
+
+      const
